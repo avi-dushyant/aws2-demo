@@ -7,50 +7,51 @@ import com.syndicate.deployment.model.RetentionSetting;
 
 import java.util.HashMap;
 import java.util.Map;
-@LambdaHandler(
-        lambdaName = "hello_world",
-        roleName = "hello_world-role",
-        isPublishVersion = false,
-        aliasName = "learn",
-        logsExpiration = RetentionSetting.SYNDICATE_ALIASES_SPECIFIED
+  @LambdaHandler(
+  		lambdaName = "hello_world",
+  		roleName = "hello_world-role",
+  		isPublishVersion = true,
+  		aliasName = "learn",
+  		logsExpiration = RetentionSetting.SYNDICATE_ALIASES_SPECIFIED
+  )
+@LambdaUrlConfig(
+		authType = AuthType.NONE, // This means no authentication is required to access the Function URL
+		invokeMode = InvokeMode.BUFFERED // This can be set to BUFFERED or STREAMING based on your requirements
 )
-public class HelloWorld implements RequestHandler<Map<String, Object>, Map<String, Object>> {
-    @Override
-    public Map<String, Object> handleRequest(Map<String, Object> request, Context context) {
-        String path = (String) request.get("path");
-        String method = (String) request.get("httpMethod");
+public class HelloWorld implements RequestHandler<APIGatewayV2HTTPEvent, APIGatewayV2HTTPResponse> {
 
-        Map<String, Object> responseMap = new HashMap<>();
-        if (path.contains("/hello") && "GET".equalsIgnoreCase(method)) {
-            responseMap.put("statusCode", 200);
-            responseMap.put("message", "Hello from Lambda");
-        } else {
-            responseMap.put("statusCode", 400);
-            responseMap.put("message", String.format(
-                    "Bad request syntax or unsupported method. Request path: %s. HTTP method: %s",
-                    path, method
-            ));       }
-        return responseMap;
-    }
-}
+	private static final ObjectMapper objectMapper = new ObjectMapper();
 
+	@Override
+	public APIGatewayV2HTTPResponse handleRequest(APIGatewayV2HTTPEvent requestEvent, Context context) {
+		String path = requestEvent.getRequestContext().getHttp().getPath();
+		String method = requestEvent.getRequestContext().getHttp().getMethod();
 
+		// Check if the request is for the /hello endpoint
+		if ("GET".equals(method) && "/hello".equals(path)) {
+			return buildResponse(200, "Hello from Lambda");
+		} else {
+			// Handle all other paths with a 400 error
+			return buildResponse(400, String.format("Bad request syntax or unsupported method. Request path: %s. HTTP method: %s", path, method));
+		}
+	}
 
+	private APIGatewayV2HTTPResponse buildResponse(int statusCode, String message) {
+		Map<String, Object> resultMap = new HashMap<>();
+		resultMap.put("statusCode", statusCode);
+		resultMap.put("message", message);
 
-//@LambdaHandler(
-//    lambdaName = "hello_world",
-//	roleName = "hello_world-role",
-//	isPublishVersion = true,
-//	aliasName = "learn",
-//	logsExpiration = RetentionSetting.SYNDICATE_ALIASES_SPECIFIED
-//)
-//public class HelloWorld implements RequestHandler<Object, Map<String, Object>> {
-//
-//	public Map<String, Object> handleRequest(Object request, Context context) {
-//		System.out.println("Hello from lambda");
-//		Map<String, Object> resultMap = new HashMap<String, Object>();
-//		resultMap.put("statusCode", 200);
-//		resultMap.put("message", "Hello from Lambda");
-//		return resultMap;
-//	}
-//}
+		String responseBody;
+		try {
+			responseBody = objectMapper.writeValueAsString(resultMap);
+		} catch (JsonProcessingException e) {
+			// Handle JSON processing error if it occurs
+			responseBody = "{\"statusCode\":500,\"message\":\"Internal Server Error\"}";
+		}
+
+		return APIGatewayV2HTTPResponse.builder()
+				.withStatusCode(statusCode)
+				.withHeaders(Map.of("Content-Type", "application/json"))
+				.withBody(responseBody)
+				.build();
+	}
