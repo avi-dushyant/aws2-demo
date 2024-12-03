@@ -3,7 +3,7 @@
     "name" : "api_handler",
     "lambda_path" : "C:\\Users\\avi_dushyant\\Desktop\\aws2task\\aws2-demo\\task10",
     "version" : "1.0.0",
-    "func_name" : "com.task11.APIHandler",
+    "func_name" : "com.task10.APIHandler",
     "deployment_package" : "task10-1.0.0.jar",
     "resource_type" : "lambda",
     "runtime" : "java17",
