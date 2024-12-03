@@ -1,7 +1,7 @@
 {
   "api_handler" : {
     "name" : "api_handler",
-    "lambda_path" : "C:\\Users\\vulchidevi_chinmayi\\Desktop\\lambda taks\\serverlessTask06\\task10",
+    "lambda_path" : "C:\\Users\\avi_dushyant\\Desktop\\aws2task\\aws2-demo\\task10",
     "version" : "1.0.0",
     "func_name" : "com.task10.APIHandler",
     "deployment_package" : "task10-1.0.0.jar",
