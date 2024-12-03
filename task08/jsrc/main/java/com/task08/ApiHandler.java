@@ -16,11 +16,12 @@ import org.epam.openapi.App;
 
 import java.io.IOException;
 
+
 @LambdaHandler(lambdaName = "api_handler",
 		roleName = "api_handler-role",
 		layers = "sdk-layer",
-		aliasName = "learn",
 		runtime = DeploymentRuntime.JAVA11,
+		aliasName = "${lambdas_alias_name}",
 		architecture = Architecture.ARM64,
 		logsExpiration = RetentionSetting.SYNDICATE_ALIASES_SPECIFIED
 )
@@ -38,18 +39,16 @@ import java.io.IOException;
 public class ApiHandler implements RequestHandler<Object, String> {
 
 	public String handleRequest(Object request, Context context) {
-		// Define latitude and longitude (can be parameterized based on incoming request)
-		App client = new App(50.4375, 30.5); // Using Kiev's coordinates
+
+		App client = new App(50.4375, 30.5);
 		JsonObject weatherData = null;
 
 		try {
-			// Fetch weather data
 			weatherData = client.getWeatherForecast();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 
-		// Return the weather data in JSON format as a string
 		return weatherData.toString();
 	}
 }

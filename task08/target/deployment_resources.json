@@ -1,7 +1,7 @@
 {
   "api_handler" : {
     "name" : "api_handler",
-    "lambda_path" : "C:\\Users\\avi_dushyant\\Desktop\\aws2task\\aws2-demo\\task08",
+    "lambda_path" : "C:\\Programming\\Projects\\AWS\\task08",
     "version" : "1.0.0",
     "func_name" : "com.task08.ApiHandler",
     "deployment_package" : "task08-1.0.0.jar",
@@ -17,7 +17,7 @@
     "event_sources" : [ ],
     "env_variables" : { },
     "publish_version" : false,
-    "alias" : "learn",
+    "alias" : "${lambdas_alias_name}",
     "layers" : [ "sdk-layer" ],
     "logs_expiration" : "${logs_expiration}",
     "snap_start" : "None",
